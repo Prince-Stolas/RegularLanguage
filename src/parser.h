@@ -32,7 +32,8 @@ struct Expr {
     VAR_INT,
     VAR_STR,
     ASSIGN_VAR,
-    STMT_RET
+    STMT_RET,
+    EXPR_EOF
   } kind;
   struct {
     struct FunCall funCall;

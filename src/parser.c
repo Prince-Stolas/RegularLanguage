@@ -13,7 +13,7 @@ struct Token expectTok(int cnt, ...) {
   va_start(arg_list, cnt);
   
   struct Token tok = nextToken();
-  if (!tok.val) return tok;
+  if (tok.isEnd) return tok;
 
   bool isRight = false;
   for (int i=0;i<cnt;i++) {
@@ -30,23 +30,22 @@ struct Token expectTok(int cnt, ...) {
     exitWErrRC(tok.loc.row, tok.loc.col, buffer, 1);
   }*/
   
-  if (!isRight) {
-    free(tok.val);
-    tok.val = NULL;
-  }
+  if (!isRight) tok.isWrong = true;
   return tok;
 }
 
 void exitWrongTok(struct Token tok) {
-  exitWErrRC(tok.loc.row, tok.loc.col, "TOKEN not usable in this context!", 1);
+  char msg[29+strlen(tok.kind)];
+  sprintf(msg, "%s not usable in this context!", tok.kind);
+  exitWErrRC(tok.loc.row, tok.loc.col, msg, 1);
 }
 
-void expectTokWErr(int cnt, ...) {
+struct Token expectTokWErr(int cnt, ...) {
   va_list arg_list;
   va_start(arg_list, cnt);
   
   struct Token tok = nextToken();
-  if (!tok.val) exitWrongTok(tok);
+  if (tok.isEnd) exitWrongTok(tok);
 
   bool isRight = false;
   for (int i=0;i<cnt;i++) {
@@ -58,27 +57,28 @@ void expectTokWErr(int cnt, ...) {
   va_end(arg_list);
 
   if (!isRight) exitWrongTok(tok);
-  free(tok.val);
+  return tok;
 }
 
 struct Expr parseExpr() {
   struct Expr expr;
   struct Token tok;
   do {
+    if (tok.val) free(tok.val);
     tok = expectTok(1, "TOKEN_NAME");
-  } while (!tok.val && tok.kind);
-  if (!tok.val) exitWrongTok(tok);
+  } while (tok.isWrong && !tok.isEnd);
+  if (tok.isEnd) return (struct Expr){.kind=EXPR_EOF};
 
   if (strcmp(tok.val, "print") == 0) {
-    expectTokWErr(1, "TOKEN_PARANO");
+    free(expectTokWErr(1, "TOKEN_PARANO").val);
 
     struct Token nextTok = expectTok(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
-    if (strcmp(nextTok.kind, "TOKEN_STRING") == 0) {
-      expectTokWErr(1, "TOKEN_PARANC");
-      expectTokWErr(2, "TOKEN_NEWLINE", "TOKEN_SEMICOL");
+    if (strcmp(nextTok.kind, "TOKEN_STRING") == 0 || strcmp(nextTok.kind, "TOKEN_INT") == 0) {
+      free(expectTokWErr(1, "TOKEN_PARANC").val);
+      free(expectTokWErr(2, "TOKEN_NEWLINE", "TOKEN_SEMICOL").val);
       struct Expr* argv = (struct Expr*) malloc(sizeof(struct Expr));
       argv[0] = (struct Expr){
-	.kind = LIT_STR,
+	.kind = strcmp(nextTok.kind, "TOKEN_STRING") == 0 ? LIT_STR : LIT_INT,
 	.val.litVal = nextTok.val
       };
       expr = (struct Expr){
@@ -94,9 +94,8 @@ struct Expr parseExpr() {
   }
   
   struct Token nextTok = expectTok(1, "TOKEN_EQUALS");
-  if (nextTok.val) {
-    struct Token varVal = expectTok(2, "TOKEN_INT", "TOKEN_STRING");
-    if (!varVal.val) exitWrongTok(varVal);
+  if (!nextTok.isWrong) {
+    struct Token varVal = expectTokWErr(2, "TOKEN_INT", "TOKEN_STRING");
     expr = (struct Expr){
       .kind = ASSIGN_VAR,
       .val.var = {
@@ -113,8 +112,14 @@ struct Expr parseExpr() {
 }
 
 struct Expr* parse() {
-  struct Expr expr = parseExpr();
+  int exprAmt = 0;
   struct Expr* exprs = (struct Expr*) malloc(sizeof(struct Expr));
-  exprs[0] = expr;
+  while (true) {
+    struct Expr expr = parseExpr();
+    if (expr.kind == EXPR_EOF) break;
+    exprs[exprAmt] = expr;
+    exprAmt++;
+    exprs = realloc(exprs, sizeof(struct Expr)*(exprAmt+1));
+  }
   return exprs;
 }

@@ -23,7 +23,7 @@
 // #define TOKEN_DOT "TOKEN_DOT"
 // #define TOKEN_NEWLINE "TOKEN_NEWLINE"
 
-int row = 0;
+int row = 1;
 int col = 1;
 char* source;
 
@@ -31,7 +31,9 @@ struct Token token(char* kind, char* val, struct Loc loc) {
   struct Token tok = {
     .kind = kind,
     .val = val,
-    .loc = loc
+    .loc = loc,
+    .isEnd = false,
+    .isWrong = false
   };
 
   return tok;
@@ -87,7 +89,10 @@ char* subStr(char* src, int len) {
 }
 
 struct Token nextToken() {
-  struct Token endTok = {};
+  struct Token endTok = {
+    .kind = "TOKEN_EOF",
+    .isEnd = true
+  };
 
   trimLeft();
   while (!eof()) {

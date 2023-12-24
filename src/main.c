@@ -25,11 +25,15 @@ int main(int argc, char** argv) {
   //printf("%d\n", exprs[0].kind);
   //printf("%s\n", exprs[0].val.funCall.funName);
   //printf("%d\n", exprs[0].val.funCall.argc);
-  printf("%s\n", exprs[0].val.funCall.argv[0].val.litVal);
+  //int exprAmt = *(&exprs+1) - exprs;
+  //printf("%d\n", exprAmt);
+  for (int i=0;i<1;i++) {
+    printf("%s\n", exprs[i].val.funCall.argv[i].val.litVal);
 
-  free(exprs[0].val.funCall.funName);
-  free(exprs[0].val.funCall.argv[0].val.litVal);
-  free(exprs[0].val.funCall.argv);
+    free(exprs[i].val.funCall.funName);
+    free(exprs[i].val.funCall.argv[i].val.litVal);
+    free(exprs[i].val.funCall.argv);
+  }
   free(exprs);
   free(orgSource);
   return 0;
