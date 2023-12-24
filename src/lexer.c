@@ -151,6 +151,7 @@ struct Token nextToken() {
       case ',': oneCharTok = "TOKEN_COMMA"; break;
       case ';': oneCharTok = "TOKEN_SEMICOL"; break;
       case '.': oneCharTok = "TOKEN_DOT"; break;
+      case '!': oneCharTok = "TOKEN_EXCLEM"; break;
       case '\n':oneCharTok = "TOKEN_NEWLINE"; break;
     }
     skipChar();
