@@ -1,0 +1,22 @@
+a = 1
+b = "Hello"
+c = 'World'
+d = [1, 2, 3]
+e = [1::100]
+//This is a comment
+
+/*
+this
+is
+also
+a
+comment
+*/
+
+fn test(param1, param2) ->
+  print(param1 : param2)
+  print("Test123")
+.
+
+test(b : ", ", c)
+
