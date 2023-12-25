@@ -17,7 +17,8 @@ struct FunDef {
 struct Var {
   enum {
     INT,
-    STR
+    STR,
+    READ
   } kind;
   char* name;
   char* val;
@@ -29,8 +30,7 @@ struct Expr {
     FUN_DEF,
     LIT_INT,
     LIT_STR,
-    VAR_INT,
-    VAR_STR,
+    READ_VAR,
     ASSIGN_VAR,
     STMT_RET,
     EXPR_EOF

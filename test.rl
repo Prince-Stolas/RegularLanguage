@@ -2,8 +2,11 @@
 //  z = x+y ; rtn z
 //.
 
-//a = 1
-//b = 2
+a = "HALLO!!!!"
+b = 2
 
 print("Hello, World!")
+print(123)
+print(a); print(b)
+print(c)
 //print(add(a, b))

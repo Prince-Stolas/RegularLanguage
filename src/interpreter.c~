@@ -1,0 +1,36 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "interpreter.h"
+#include "parser.h"
+
+void interpret(struct Expr* exprs) {
+  struct Var* vars = (struct Var*) malloc(0);
+  int varAmt = 0;
+  int i = 0;
+  while (exprs[i].kind != EXPR_EOF) {
+    switch (exprs[i].kind) {
+    case ASSIGN_VAR:
+      varAmt++;
+      vars = realloc(vars, sizeof(struct Var)*varAmt);
+      vars[varAmt-1] = exprs[i].val.var;
+      break;
+    case FUN_CALL:
+      char* funName = exprs[i].val.funCall.funName;
+      if (strcmp(funName, "print") == 0) {
+	printf("%s\n", exprs[i].val.funCall.argv[0].val.litVal);
+
+	free(exprs[i].val.funCall.argv[0].val.litVal);
+	free(exprs[i].val.funCall.argv);
+	free(funName);
+	break;
+      }
+    }
+
+    i++;
+  }
+
+  free(vars);
+  free(exprs);
+}
