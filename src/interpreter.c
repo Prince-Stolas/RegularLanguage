@@ -22,6 +22,13 @@ void interpret(struct Expr* exprs) {
   while (exprs[i].kind != EXPR_EOF) {
     switch (exprs[i].kind) {
     case ASSIGN_VAR:
+      if (exprs[i].val.var.kind == CPY_VAR) {
+	struct Var var = searchVarWErr(exprs[i].val.var.val);
+	free(exprs[i].val.var.val);
+	exprs[i].val.var.val = (char*) malloc(strlen(var.val)+1);
+	strcpy(exprs[i].val.var.val, var.val);
+	exprs[i].val.var.kind = var.kind;
+      }
       varAmt++;
       vars = realloc(vars, sizeof(struct Var)*varAmt);
       vars[varAmt-1] = exprs[i].val.var;

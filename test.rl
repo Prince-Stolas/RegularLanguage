@@ -4,6 +4,7 @@
 
 a = "HALLO!!!!"
 b = 2
+c = d
 
 print("Hello, World!")
 print(123)

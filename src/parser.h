@@ -18,7 +18,8 @@ struct Var {
   enum {
     INT,
     STR,
-    READ
+    READ,
+    CPY_VAR
   } kind;
   char* name;
   char* val;

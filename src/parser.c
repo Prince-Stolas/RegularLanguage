@@ -111,11 +111,11 @@ struct Expr parseExpr() {
   //variables
   struct Token nextTok = expectTokWErr(1, "TOKEN_EQUALS");
   if (!nextTok.isWrong) {
-    struct Token varVal = expectTokWErr(2, "TOKEN_INT", "TOKEN_STRING");
+    struct Token varVal = expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
     expr = (struct Expr){
       .kind = ASSIGN_VAR,
       .val.var = {
-	.kind = strcmp(varVal.kind, "TOKEN_INT") == 0 ? INT : STR,
+        .kind = strcmp(varVal.kind, "TOKEN_NAME") == 0 ? CPY_VAR : (strcmp(varVal.kind, "TOKEN_INT") == 0 ? INT : STR),
         .name = tok.val,
         .val = varVal.val
       }
