@@ -2,12 +2,11 @@
 //  z = x+y ; rtn z
 //.
 
-a = "HALLO!!!!"
-b = 2
-c = d
+a = 1
+ref b = a
 
-print("Hello, World!")
-print(123)
-print(a); print(b)
-print(c)
+a = 2
+
+print(a)
+print(b)
 //print(add(a, b))

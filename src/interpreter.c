@@ -16,6 +16,13 @@ struct Var searchVarWErr(char* name) {
   exitWErr("Trying to use undeclared variable!", 1);
 }
 
+int searchVarPos(char* name) {
+  for (int i=0;i<varAmt;i++) {
+    if (strcmp(vars[i].name, name) == 0) return i;
+  }
+  return -1;
+}
+
 void interpret(struct Expr* exprs) {
   vars = (struct Var*) malloc(0);
   int i = 0;
@@ -25,13 +32,25 @@ void interpret(struct Expr* exprs) {
       if (exprs[i].val.var.kind == CPY_VAR) {
 	struct Var var = searchVarWErr(exprs[i].val.var.val);
 	free(exprs[i].val.var.val);
-	exprs[i].val.var.val = (char*) malloc(strlen(var.val)+1);
-	strcpy(exprs[i].val.var.val, var.val);
+	if (!exprs[i].val.var.isRef) {
+	  exprs[i].val.var.val = (char*) malloc(strlen(var.val)+1);
+	  strcpy(exprs[i].val.var.val, var.val);
+	} else {
+	  exprs[i].val.var.val = var.val;
+	}
 	exprs[i].val.var.kind = var.kind;
       }
-      varAmt++;
-      vars = realloc(vars, sizeof(struct Var)*varAmt);
-      vars[varAmt-1] = exprs[i].val.var;
+      int replaceVar = searchVarPos(exprs[i].val.var.name);
+      if (replaceVar >= 0) {
+	free(exprs[i].val.var.name);
+	vars[replaceVar].val = realloc(vars[replaceVar].val, strlen(exprs[i].val.var.val)+1);
+	strcpy(vars[replaceVar].val, exprs[i].val.var.val);
+	free(exprs[i].val.var.val);
+      } else {
+	varAmt++;
+	vars = realloc(vars, sizeof(struct Var)*varAmt);
+	vars[varAmt-1] = exprs[i].val.var;
+      }
       break;
     case FUN_CALL:
       char* funName = exprs[i].val.funCall.funName;
@@ -59,7 +78,7 @@ void interpret(struct Expr* exprs) {
 
   for (int j=0;j<varAmt;j++) {
     free(vars[j].name);
-    free(vars[j].val);
+    if(!vars[j].isRef) free(vars[j].val);
   }
   free(vars);
   free(exprs);
