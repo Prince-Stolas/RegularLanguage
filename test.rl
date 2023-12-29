@@ -2,11 +2,8 @@
 //  z = x+y ; rtn z
 //.
 
-a = 1
-ref b = a
+a = 1 print(a)
 
-a = 2
-
-print(a)
-print(b)
+//print(a)
+//print(b)
 //print(add(a, b))

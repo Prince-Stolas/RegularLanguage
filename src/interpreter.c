@@ -31,11 +31,12 @@ void interpret(struct Expr* exprs) {
     case ASSIGN_VAR:
       if (exprs[i].val.var.kind == CPY_VAR) {
 	struct Var var = searchVarWErr(exprs[i].val.var.val);
-	free(exprs[i].val.var.val);
+	//free(exprs[i].val.var.val);
 	if (!exprs[i].val.var.isRef) {
-	  exprs[i].val.var.val = (char*) malloc(strlen(var.val)+1);
+	  exprs[i].val.var.val = realloc(exprs[i].val.var.val, strlen(var.val)+1);
 	  strcpy(exprs[i].val.var.val, var.val);
 	} else {
+	  free(exprs[i].val.var.val);
 	  exprs[i].val.var.val = var.val;
 	}
 	exprs[i].val.var.kind = var.kind;
@@ -78,7 +79,7 @@ void interpret(struct Expr* exprs) {
 
   for (int j=0;j<varAmt;j++) {
     free(vars[j].name);
-    if(!vars[j].isRef) free(vars[j].val);
+    if (!vars[j].isRef) free(vars[j].val);
   }
   free(vars);
   free(exprs);

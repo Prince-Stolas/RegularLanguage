@@ -113,10 +113,15 @@ struct Expr parseExpr() {
   if (strcmp(tok.val, "ref") == 0) ref = true;
   
   struct Token varName;
-  if (ref) varName = expectTokWErr(1, "TOKEN_NAME");
+  if (ref) {
+    varName = expectTokWErr(1, "TOKEN_NAME");
+    free(tok.val);
+  }
   else varName = tok;
   free(expectTokWErr(1, "TOKEN_EQUALS").val);
-  struct Token varVal = expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
+  struct Token varVal;
+  if (!ref) varVal = expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
+  else varVal = expectTokWErr(1, "TOKEN_NAME");
   expr = (struct Expr){
     .kind = ASSIGN_VAR,
     .val.var = {
