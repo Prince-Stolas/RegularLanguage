@@ -13,7 +13,7 @@ struct Var searchVarWErr(char* name) {
   for (int i=0;i<varAmt;i++) {
     if (strcmp(vars[i].name, name) == 0) return vars[i];
   }
-  exitWErr("Trying to use undeclared variable!", 1);
+  exitWErr("Trying to use undeclared variable!", 2);
 }
 
 int searchVarPos(char* name) {
@@ -31,14 +31,9 @@ void interpret(struct Expr* exprs) {
     case ASSIGN_VAR:
       if (exprs[i].val.var.kind == CPY_VAR) {
 	struct Var var = searchVarWErr(exprs[i].val.var.val);
-	//free(exprs[i].val.var.val);
-	if (!exprs[i].val.var.isRef) {
-	  exprs[i].val.var.val = realloc(exprs[i].val.var.val, strlen(var.val)+1);
-	  strcpy(exprs[i].val.var.val, var.val);
-	} else {
-	  free(exprs[i].val.var.val);
-	  exprs[i].val.var.val = var.val;
-	}
+	
+	exprs[i].val.var.val = realloc(exprs[i].val.var.val, strlen(var.val)+1);
+	strcpy(exprs[i].val.var.val, var.val);
 	exprs[i].val.var.kind = var.kind;
       }
       int replaceVar = searchVarPos(exprs[i].val.var.name);
@@ -68,10 +63,12 @@ void interpret(struct Expr* exprs) {
 
 	  free(exprs[i].val.funCall.argv[0].val.var.name);
 	}
-	free(exprs[i].val.funCall.argv);
-	free(funName);
 	break;
+      } else {
+	exit(atoi(exprs[i].val.funCall.argv[0].val.litVal));
       }
+      free(exprs[i].val.funCall.argv);
+      free(funName);
     }
 
     i++;
@@ -79,7 +76,7 @@ void interpret(struct Expr* exprs) {
 
   for (int j=0;j<varAmt;j++) {
     free(vars[j].name);
-    if (!vars[j].isRef) free(vars[j].val);
+    free(vars[j].val);
   }
   free(vars);
   free(exprs);

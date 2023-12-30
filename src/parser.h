@@ -1,8 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <stdbool.h>
-
 struct FunCall {
   char* funName;
   int argc;
@@ -25,7 +23,6 @@ struct Var {
   } kind;
   char* name;
   char* val;
-  bool isRef;
 };
 
 struct Expr {

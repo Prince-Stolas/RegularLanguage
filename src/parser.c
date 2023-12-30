@@ -23,12 +23,6 @@ struct Token expectTok(int cnt, ...) {
   }
 
   va_end(arg_list);
-
-  /*if (!isRight) {
-    char buffer[21+strlen(tok.kind)];
-    sprintf(buffer, "%s not usable in this context!", tok.kind);
-    exitWErrRC(tok.loc.row, tok.loc.col, buffer, 1);
-  }*/
   
   if (!isRight) tok.isWrong = true;
   return tok;
@@ -74,10 +68,11 @@ struct Expr parseExpr() {
   if (tok.isEnd) return (struct Expr){.kind=EXPR_EOF};
   if (tok.isWrong) exitWrongTok(tok);
 
-  if (strcmp(tok.val, "print") == 0) {
+  if (strcmp(tok.val, "print") == 0 || strcmp(tok.val, "exit") == 0) {
     free(expectTokWErr(1, "TOKEN_PARANO").val);
 
-    struct Token nextTok = expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
+    struct Token nextTok = strcmp(tok.val, "print")==0?expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING")
+      :expectTokWErr(1, "TOKEN_INT");
     free(expectTokWErr(1, "TOKEN_PARANC").val);
     free(expectTokWErr(2, "TOKEN_NEWLINE", "TOKEN_SEMICOL").val);
     struct Expr* argv = (struct Expr*) malloc(sizeof(struct Expr));
@@ -109,26 +104,15 @@ struct Expr parseExpr() {
   }
 
   //variables
-  bool ref = false;
-  if (strcmp(tok.val, "ref") == 0) ref = true;
-  
-  struct Token varName;
-  if (ref) {
-    varName = expectTokWErr(1, "TOKEN_NAME");
-    free(tok.val);
-  }
-  else varName = tok;
   free(expectTokWErr(1, "TOKEN_EQUALS").val);
-  struct Token varVal;
-  if (!ref) varVal = expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
-  else varVal = expectTokWErr(1, "TOKEN_NAME");
+  struct Token varVal = expectTokWErr(3, "TOKEN_NAME", "TOKEN_INT", "TOKEN_STRING");
+  free(expectTokWErr(2, "TOKEN_NEWLINE", "TOKEN_SEMICOL").val);
   expr = (struct Expr){
     .kind = ASSIGN_VAR,
     .val.var = {
       .kind = strcmp(varVal.kind, "TOKEN_NAME") == 0 ? CPY_VAR : (strcmp(varVal.kind, "TOKEN_INT") == 0 ? INT : STR),
-      .name = varName.val,
-      .val = varVal.val,
-      .isRef = ref
+      .name = tok.val,
+      .val = varVal.val
     }
   };
 

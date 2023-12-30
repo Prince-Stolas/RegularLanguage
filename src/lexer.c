@@ -5,24 +5,6 @@
 
 #include "lexer.h"
 
-// #define TOKEN_NAME "TOKEN_NAME"
-// #define TOKEN_NAME "TOKEN_INT"
-// #define TOKEN_NAME "TOKEN_STRING"
-// #define TOKEN_NAME "TOKEN_ARROW"
-// #define TOKEN_PARANO "TOKEN_PARANO"
-// #define TOKEN_PRAANC "TOKEN_PARANC"
-// #define TOKEN_EQUALS "TOKEN_EQUALS"
-// #define TOKEN_PLUS "TOKEN_PLUS"
-// #define TOKEN_MINUS "TOKEN_MINUS" 
-// #define TOKEN_STAR "TOKEN_STAR"
-// #define TOKEN_SLASH "TOKEN_SLASH" 
-// #define TOKEN_GREATER "TOKEN_GREATER"
-// #define TOKEN_LESS "TOKEN_LESS"
-// #define TOKEN_COMMA "TOKEN_COMMA" 
-// #define TOKEN_SEMICOL "TOKEN_SEMICOL"
-// #define TOKEN_DOT "TOKEN_DOT"
-// #define TOKEN_NEWLINE "TOKEN_NEWLINE"
-
 int row = 1;
 int col = 1;
 char* source;
